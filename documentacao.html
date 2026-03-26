@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação: Simulador e Monitor de Blocks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e53935;
+            --secondary-color: #1e88e5;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --bg-body: #f7f9fc;
+            --bg-card: #ffffff;
+            --border-color: #eaebf1;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .header-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #ffffff;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .header-bg h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-bg p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 15px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #111827;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background-color: #eff6ff;
+            color: var(--secondary-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #bfdbfe;
+        }
+
+        .screenshot-container {
+            margin: 20px 0;
+            text-align: center;
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #d1d5db;
+        }
+
+        .screenshot-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .screenshot-title {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .steps-list {
+            padding-left: 20px;
+        }
+
+        .steps-list li {
+            margin-bottom: 12px;
+        }
+        
+        .steps-list strong {
+            color: #111827;
+        }
+
+        .code-inline {
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e11d48;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-bg">
+        <h1>Simulador e Monitor de Blocks</h1>
+        <p>Documentação oficial da aplicação interativa para simulação de bloqueios (locks) no SQL Server e monitoramento avançado via T-SQL (DMVs).</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="card">
+            <h2>🎯 Visão Geral do Sistema</h2>
+            <p>
+                A aplicação oferece uma interface fluida baseada em <strong>Streamlit</strong> capaz de gerar e diagnosticar problemas de bloqueio (blocking chains) dentro de um ambiente <strong>SQL Server</strong> local. 
+                Foi projetada para ser uma ferramenta robusta para estudos, testes de gargalos de concorrência, e homologação de ambientes.
+            </p>
+            
+            <div class="tech-tags">
+                <span class="tag">Python</span>
+                <span class="tag">Streamlit</span>
+                <span class="tag">PyODBC</span>
+                <span class="tag">T-SQL</span>
+                <span class="tag">DMVs</span>
+            </div>
+            
+            <p>O fluxo core do sistema acontece paralelizando transações isoladas via interface gráfica (para que não travem a aplicação em Python da UI) enquanto a camada de monitoramento interroga o SQL Server executando queries avançadas nas <strong>DMVs (Dynamic Management Views)</strong> para gerar relatórios em tempo real.</p>
+        </div>
+
+        <div class="card">
+            <h2>🕹️ Aba 1: Geração de Blocos em Background</h2>
+            <p>
+                A primeira seção serve para iniciar a transação problemática. O simulador se conecta ao banco de dados <code>AdventureWorks2022</code> como usuário administrador (sa) e executa um comando inofensivo de <code>UPDATE</code> numa tabela crítica (<span class="code-inline">Person.Person</span>).
+            </p>
+            <p>A transação então usa o comando <span class="code-inline">WAITFOR DELAY</span> para paralisar e reter o <em>Exclusive Lock (X)</em> por um tempo ditado por você através do componente deslizante (Slider), variando entre 10 e 120 segundos.</p>
+            
+            <div class="screenshot-container">
+                <img src="img_simulador.png" alt="Tela do Simulador Streamlit">
+                <div class="screenshot-title">Interface gráfica que não trava durante os locks por utilizar Threads Python dedicadas.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Aba 2: Monitoramento via DMVs</h2>
+            <p>
+                Qualquer sistema DBA avançado precisa de ferramentas assertivas para diagnóstico. Esta divisão da aplicação realiza consultas diretas nas visões de gerenciamento dinâmico (DMVs) do SQL Server.
+            </p>
+            <p>
+                <strong>🌟 Evolução Arquitetural (De dbatools para DMVs):</strong> Em versões anteriores, o sistema dependia da execução de scripts PowerShell em background chamando o módulo <code>dbatools</code> (Get-DbaProcess, Get-DbaOpenTransaction). Para aumentar o desempenho e reduzir a complexidade, a aplicação foi refatorada e agora utiliza exclusivamente <b>consultas T-SQL nativas</b> (via PyODBC) acessando as DMVs. Isso elimina o overhead do PowerShell e exibe os dados quase que instantaneamente.
+            </p>
+            <p>
+                Ao clicar em <em>"Atualizar Relatório"</em>, o backend em Python executa consultas T-SQL avançadas e utiliza a biblioteca <code>pandas</code> para construir as métricas e tabelas de forma interativa:
+            </p>
+            <ul class="steps-list">
+                <li>Mapeia a <strong>Cadeia de Bloqueios (Blocking Chain)</strong> e a Árvore de Dependência efetuando um join entre <code>sys.dm_exec_requests</code> e <code>sys.dm_exec_sessions</code>.</li>
+                <li>Extrai, por meio da função <code>sys.dm_exec_sql_text</code>, as queries exatas que estão causando os locks (bloqueadores e vítimas).</li>
+                <li>Mapeia todas as <strong>Transações Abertas</strong> e o seu estado executando queries em <code>sys.dm_tran_active_transactions</code>.</li>
+            </ul>
+
+            <div class="screenshot-container">
+                <img src="img_monitoramento.png" alt="Tela de Monitoramento">
+                <div class="screenshot-title">Alerta evidenciando exatamente que SPID está sendo a vítima de bloqueio e quem é o culpado.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Fluxo Prático de Teste de Performance</h2>
+            <ol class="steps-list">
+                <li>Inicie o app executando localmente o comando: <code>.\venv\Scripts\streamlit run app.py</code></li>
+                <li>Abra a aplicação em <strong>http://localhost:8501</strong> e navegue no simulador.</li>
+                <li>Escolha, por exemplo, <strong>60 Segundos</strong> no slider, ou mais se precisar de tempo extra. </li>
+                <li>Clique no botão primário para criar a obstrução fantasma. </li>
+                <li>Vá imediatamente a outro terminal, como o  <strong>SSMS (SQL Server Management Studio)</strong>, e inicie uma consulta concorrente, por exemplo uma simples query: <br><br><code>SELECT * FROM AdventureWorks2022.Person.Person WHERE BusinessEntityID = 1;</code><br><br>Você notará que essa janela ficará infinitamente executando ("pendurada").</li>
+                <li>Volte à nossa interface Streamlit, acesse a <strong>aba 2 (Monitoramento via DMVs)</strong> e clique para exibir o Relatório Analítico. Este relatório exibirá os SPIDs, as sessões ofensoras e toda a cadeia estrutural do bloqueio!</li>
+            </ol>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Projeto Desenvolvido por Antigravity-DBA Agent (2026)</p>
+    </footer>
+
+</body>
+</html>
